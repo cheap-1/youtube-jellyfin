@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+    # Keeps the development container running
+    command: sleep infinity
+    networks:
+      - jellyfin-net
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin-dev-server
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+    environment:
+      - JELLYFIN_PublishedServerUrl=http://localhost:8096
+    networks:
+      - jellyfin-net
+
+volumes:
+  jellyfin-config:
+  jellyfin-cache:
+
+networks:
+  jellyfin-net:
+    driver: bridge
